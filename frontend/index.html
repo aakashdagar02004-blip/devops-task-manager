@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevOps Task Manager</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f4f4f4;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .container {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+        }
+
+        input {
+            padding: 10px;
+            width: 70%;
+        }
+
+        button {
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+
+        li {
+            margin: 10px 0;
+            padding: 10px;
+            background: #eee;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>DevOps Task Manager</h1>
+
+    <input type="text" id="taskInput" placeholder="Enter a task">
+    <button onclick="addTask()">Add Task</button>
+
+    <h2>Tasks</h2>
+
+    <ul id="taskList"></ul>
+
+</div>
+
+<script>
+
+async function loadTasks() {
+    try {
+        const response = await fetch('/api/tasks');
+        const tasks = await response.json();
+
+        const list = document.getElementById('taskList');
+        list.innerHTML = '';
+
+        tasks.forEach(task => {
+            const li = document.createElement('li');
+            li.textContent = task.title || task.name || JSON.stringify(task);
+            list.appendChild(li);
+        });
+
+    } catch (error) {
+        console.error('Error loading tasks:', error);
+    }
+}
+
+async function addTask() {
+
+    const input = document.getElementById('taskInput');
+    const title = input.value.trim();
+
+    if (!title) {
+        alert('Enter a task');
+        return;
+    }
+
+    await fetch('/api/tasks', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ title: title })
+    });
+
+    input.value = '';
+    loadTasks();
+}
+
+loadTasks();
+
+</script>
+
+</body>
+</html>
