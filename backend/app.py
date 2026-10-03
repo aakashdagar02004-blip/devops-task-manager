@@ -8,7 +8,7 @@ def get_db():
     return mysql.connector.connect(
         host=os.getenv("DB_HOST", "mysql"),
         user=os.getenv("DB_USER", "devops"),
-        password=os.getenv("DB_PASSWORD", "devops123"),
+        password=os.getenv("DB_PASSWORD"),
         database=os.getenv("DB_NAME", "taskdb")
     )
 
