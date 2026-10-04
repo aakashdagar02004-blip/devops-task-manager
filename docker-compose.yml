@@ -31,6 +31,12 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
     ports:
       - "5000:5000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000/api/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
     depends_on:
       mysql:
         condition: service_healthy
@@ -44,9 +50,15 @@ services:
     container_name: task-frontend
     ports:
       - "8081:80"
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1/"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
     depends_on:
       backend:
-        condition: service_started
+        condition: service_healthy
     networks:
       - task-network
 
