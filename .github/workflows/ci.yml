@@ -36,3 +36,19 @@ jobs:
 
       - name: Validate Docker Compose
         run: docker compose config
+
+      - name: Start application
+        run: docker compose up -d --build
+
+      - name: Check running containers
+        run: docker compose ps
+
+      - name: Test backend health
+        run: curl --fail http://localhost:5000/api/health
+
+      - name: Test tasks API through frontend
+        run: curl --fail http://localhost:8081/api/tasks
+
+      - name: Stop application
+        if: always()
+        run: docker compose down -v
