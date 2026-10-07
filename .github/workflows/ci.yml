@@ -1,4 +1,4 @@
-name: DevOps Task Manager CI
+name: DevOps Task Manager CI/CD
 
 on:
   push:
@@ -10,6 +10,7 @@ on:
 
 jobs:
   build:
+    name: CI - Build and Test
     runs-on: ubuntu-latest
 
     env:
@@ -52,3 +53,22 @@ jobs:
       - name: Stop application
         if: always()
         run: docker compose down -v
+
+  deploy:
+    name: CD - Deploy to AWS EC2
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1.2.2
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd ~/devops-task-manager
+            git pull origin master
+            docker compose up -d --build
+            docker compose ps
+            curl --fail http://localhost:5000/api/health
